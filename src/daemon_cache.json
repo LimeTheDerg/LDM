@@ -1,0 +1,10 @@
+{
+  "daemons": [
+    {
+      "name": "cpu-temperature-monitor",
+      "bin": "cpu_temp",
+      "conf_msg": "At what CPU temperature do you wish to be warned at? \n meopw :3",
+      "args": ""
+    }
+  ]
+}

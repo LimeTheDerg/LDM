@@ -32,6 +32,6 @@
 *.app
 
 cmake-build-build
+cmake-build-debug
 .idea
 bin
-src/lib

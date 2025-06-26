@@ -1,5 +1,7 @@
 #include <fstream>
 #include <iostream>
+#include <bits/this_thread_sleep.h>
+
 #include "lib/json/json.hpp"
 #include "lib/util/helper_functions.hpp"
 
@@ -32,6 +34,7 @@ int main(int argc, char *argv[]) {
 
     if (operation == "help" && argc == 2) {
         // TODO: Create help.txt file and read from it here.
+        return 0;
     }
 
     if (operation == "list" && argc == 2) {
@@ -42,5 +45,28 @@ int main(int argc, char *argv[]) {
         }
         return 0;
     }
+
+    if (operation == "start" && argc == 3) {
+        cout << "Starting daemon: " << target << "..." << "\n";
+        // Search cache if daemon is available, error if not.
+        bool isValid = false;
+        for (int i = 0; i < cache.size(); i++) {
+            if (cache["daemons"][i]["name"] == target) {
+                isValid = true;
+            }
+        }
+        if (!isValid) {
+            cerr << "Daemon not found. Run ldmi list for a list of available daemons." << "\n";
+            return 1;
+        }
+        // Ensuring child process spawning works correctly.
+        program_state process_status = fork_execv_parent(target, cache);
+        if (process_status == ERROR) {
+            cerr << "Error starting daemon.\n";
+            return 1;
+        }
+
+    }
+
     return 0;
 }

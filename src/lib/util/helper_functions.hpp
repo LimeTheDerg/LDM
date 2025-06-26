@@ -12,8 +12,8 @@ enum program_state {
 inline std::string find_process_path() {
     char path[PATH_MAX];
     // The proc.self/exe symlink always points to the process that accesses it
-    ssize_t count = readlink("/proc/self/exe", path, sizeof(path) - 1);
-    // I count is -1 something has gone catastrophically wrong
+    const ssize_t count = readlink("/proc/self/exe", path, sizeof(path) - 1);
+    // If count is -1 something has gone catastrophically wrong
     if (count != -1) {
         path[count] = '\0';
         const std::string path_str = path;
@@ -33,7 +33,7 @@ inline nlohmann::json read_cache() {
     return cache_json;
 }
 
-inline std::vector<std::string> split_by_space(std::string s) {
+inline std::vector<std::string> split_by_space(const std::string &s) {
     std::vector<std::string> arg_vector;
     std::string arg;
 
@@ -47,7 +47,7 @@ inline std::vector<std::string> split_by_space(std::string s) {
     }
     arg_vector.push_back(arg);
 
-    return arg_vector; // Return a pointer to the first element
+    return arg_vector;
 }
 
 inline program_state fork_execv_parent(const std::string& target, nlohmann::json &cache) {
@@ -61,7 +61,7 @@ inline program_state fork_execv_parent(const std::string& target, nlohmann::json
     // Child process has been found
     if (pid == 0) {
         std::string bin_name;
-        int daemon_id;
+        int daemon_id = 0;
         // Find the daemon in the cache and save its id for later
         for (int i = 0; i < cache.size(); i++) {
             if (cache["daemons"][i]["name"] == target) {
@@ -71,17 +71,23 @@ inline program_state fork_execv_parent(const std::string& target, nlohmann::json
         }
 
         // Find the bin's full path
-        const std::string bin_path = find_process_path() + "/" + bin_name;
+        const std::string bin_path = find_process_path() + "/daemons/" + bin_name;
         // Receive the arguments from the cache
-        std::vector<std::string> arg_v = split_by_space("1 2 3 4 5");
+        std::vector<std::string> arg_strs = split_by_space(cache["daemons"][daemon_id]["args"]);
 
-        for (int i = 0; i < arg_v.size(); i++) {
-            std::cout << arg_v[i] << "\n";
+        // Given the std::string vector, copy the contents into a new vector of c-style strings
+        std::vector<char*> arg_ptrs;
+        for (std::string& str : arg_strs) {
+            arg_ptrs.push_back(&str[0]);
         }
 
-        return PARENT;
+        arg_ptrs.push_back(nullptr); // execv expects a null-terminated array
+
+        execv(bin_path.c_str(), arg_ptrs.data());
+
+        return CHILD; // Will not be run, but if I remove it CMake will yell at me
     }
-    return ERROR;
+    return PARENT;
 }
 
 #endif

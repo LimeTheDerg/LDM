@@ -5,7 +5,11 @@
 
 using namespace std;
 
-[[noreturn]] int main() {
+[[noreturn]] int main(int argc, char* argv[]) {
+    cout << argc << endl;
+    for (int i = 1; i < argc; i++) {
+        cout << argv[i] << endl;
+    }
     while (true) {
         ifstream cpu_file;
         cpu_file.open("/sys/class/thermal/thermal_zone0/temp", ios::in); // Opens the file that contains temperature information for Linux

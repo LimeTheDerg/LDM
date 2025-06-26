@@ -82,6 +82,7 @@ inline program_state fork_execv_parent(const std::string& target, nlohmann::json
         }
 
         arg_ptrs.push_back(nullptr); // execv expects a null-terminated array
+        std::cout << *(arg_ptrs.data());
 
         execv(bin_path.c_str(), arg_ptrs.data());
 

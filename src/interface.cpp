@@ -47,12 +47,14 @@ int main(int argc, char *argv[]) {
     }
 
     if (operation == "start" && argc == 3) {
+        int daemon_id = 0;
         cout << "Starting daemon: " << target << "..." << "\n";
         // Search cache if daemon is available, error if not.
         bool isValid = false;
         for (int i = 0; i < cache.size(); i++) {
             if (cache["daemons"][i]["name"] == target) {
                 isValid = true;
+                daemon_id = i;
             }
         }
         if (!isValid) {
@@ -65,7 +67,8 @@ int main(int argc, char *argv[]) {
             cerr << "Error starting daemon.\n";
             return 1;
         }
-
+        //cache["daemons"][daemon_id]["status"] = "active";
+        return 0;
     }
 
     return 0;

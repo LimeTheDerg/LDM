@@ -1,6 +1,5 @@
 #ifndef HELPER_FUNCTIONS_H
 #define HELPER_FUNCTIONS_H
-#endif
 
 #include "../json/json.hpp"
 
@@ -34,32 +33,55 @@ inline nlohmann::json read_cache() {
     return cache_json;
 }
 
-inline char split_args_by_space(std::string s) {
-    std::vector<char*> arg_vector;
-    const char* s_c = s.c_str();
+inline std::vector<std::string> split_by_space(std::string s) {
+    std::vector<std::string> arg_vector;
+    std::string arg;
 
-    for (const char* p = s_c; *p != '\0'; ++p) {
-
+    // Algorithm to search through string for whitespace and push the word to vector if found
+    for (int i = 0; i < s.length(); i++) {
+        if (s[i] == ' ') {
+            arg_vector.push_back(arg);
+            arg.clear();
+        }
+        else arg += s[i];
     }
+    arg_vector.push_back(arg);
 
+    return arg_vector; // Return a pointer to the first element
 }
 
 inline program_state fork_execv_parent(const std::string& target, nlohmann::json &cache) {
-    pid_t pid = fork();
+    pid_t pid = 0;//fork(); // Create a child process
+
     if (pid < 0) {
         std::cerr << "Something has gone catastrophically wrong.";
         return ERROR;
     }
+
     // Child process has been found
     if (pid == 0) {
-        std::string bin_name = "";
+        std::string bin_name;
+        int daemon_id;
+        // Find the daemon in the cache and save its id for later
         for (int i = 0; i < cache.size(); i++) {
-            if (target == cache["daemons"][i]["name"]) {
+            if (cache["daemons"][i]["name"] == target) {
                 bin_name = cache["daemons"][i]["bin"];
+                daemon_id = i;
             }
         }
+
+        // Find the bin's full path
         const std::string bin_path = find_process_path() + "/" + bin_name;
-        const std::string fifty = "50";
-        execv(bin_path.c_str(), );
+        // Receive the arguments from the cache
+        std::vector<std::string> arg_v = split_by_space("1 2 3 4 5");
+
+        for (int i = 0; i < arg_v.size(); i++) {
+            std::cout << arg_v[i] << "\n";
+        }
+
+        return PARENT;
     }
+    return ERROR;
 }
+
+#endif

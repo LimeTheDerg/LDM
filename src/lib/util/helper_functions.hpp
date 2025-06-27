@@ -2,6 +2,7 @@
 #define HELPER_FUNCTIONS_HPP
 
 #include "../json/json.hpp"
+#include <fstream>
 
 enum program_state {
     PARENT,

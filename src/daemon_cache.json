@@ -5,7 +5,7 @@
       "bin": "cpu_temp",
       "status": "inactive",
       "conf_msg": "cpu-temp-warn-threshold",
-      "args": "50 a s d"
+      "args": "70"
     }
   ]
 }

@@ -1,6 +1,5 @@
 #include <fstream>
 #include <iostream>
-#include <bits/this_thread_sleep.h>
 
 #include "lib/json/json.hpp"
 #include "lib/util/helper_functions.hpp"
@@ -9,7 +8,7 @@ using std::cout;
 using std::cerr;
 using std::string;
 
-using json = nlohmann::json;
+using nlohmann::json;
 
 int main(int argc, char *argv[]) {
 
@@ -23,13 +22,7 @@ int main(int argc, char *argv[]) {
     // Initialize the terms of the operation
     const string operation = argv[1];
     const string target = argc > 2 ? argv[2] : "";
-    json cache;
-
-    try {
-        cache = read_cache(); // Read from cache
-    } catch (const std::exception &e) {
-        cout << "Error reading from cache file: " << e.what() << "\n";
-    }
+    json cache = read_cache(); // Read from cache
 
 
     if (operation == "help" && argc == 2) {
@@ -75,6 +68,7 @@ int main(int argc, char *argv[]) {
             } catch (const std::exception &e) {
                 cout << "Error opening cache file: " << e.what() << "\n";
             }
+            cout << "Daemon started successfully." << "\n";
             return 0;
         }
         return 0;

@@ -20,6 +20,7 @@ inline std::string find_process_path() {
         return path_str.substr(0, path_str.find_last_of('/'));
     }
     std::cerr << "Something has gone catastrophically wrong.";
+    exit(EXIT_FAILURE);
     return "";
 }
 
@@ -27,7 +28,8 @@ inline nlohmann::json read_cache() {
     std::ifstream cache_file;
     cache_file.open(find_process_path() + "/daemon_cache.json");
     if (!cache_file.is_open()) {
-        throw std::runtime_error("Failed to open cache file");
+        std::cerr << "Failed to open cache file" << "\n";
+        exit(EXIT_FAILURE);
     }
     nlohmann::json cache_json = nlohmann::json::parse(cache_file);
     cache_file.close();
@@ -93,8 +95,10 @@ inline program_state fork_execv_parent(const std::string& target, nlohmann::json
 inline void write_cache(nlohmann::json &cache) {
     std::ofstream cache_file;
     cache_file.open(find_process_path() + "/daemon_cache.json", std::ios::trunc);
+
     if (!cache_file.is_open()) {
-      throw std::runtime_error("Failed to write cache file");
+        std::cerr << "Failed to write to cache file" << "\n";
+        exit(EXIT_FAILURE);
     }
 
     const std::string cache_json = cache.dump(1); // Creates an indented string using current cache in program

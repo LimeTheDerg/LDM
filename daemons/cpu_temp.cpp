@@ -2,10 +2,12 @@
 #include <iostream>
 #include <fstream>
 #include <thread>
+#include "daemon_function_wrapper.hpp"
 
 using namespace std;
 
-[[noreturn]] int main(const int argc, char* argv[]) {
+int main(const int argc, char* argv[]) {
+    daemonize();
 
     if (argc != 1) {
         cerr << "Error reading from cache, cache may be malformed or tampered with." << "\n";

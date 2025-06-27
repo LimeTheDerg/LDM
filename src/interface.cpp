@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
             }
         }
         if (!isValid) {
-            cerr << "Daemon not found. Run ldmi list for a list of available daemons." << "\n";
+            cerr << "Daemon not found. Run 'ldmi list' for a list of available daemons." << "\n";
             return 1;
         }
         // Ensuring child process spawning works correctly.
@@ -67,9 +67,20 @@ int main(int argc, char *argv[]) {
             cerr << "Error starting daemon.\n";
             return 1;
         }
-        //cache["daemons"][daemon_id]["status"] = "active";
+
+        if (process_status == PARENT) {
+            cache["daemons"][daemon_id]["status"] = "active";
+            try {
+                write_cache(cache);
+            } catch (const std::exception &e) {
+                cout << "Error opening cache file: " << e.what() << "\n";
+            }
+            return 0;
+        }
         return 0;
     }
+
+    cerr << "Invalid usage, wrong arguments. Run 'ldmi help' for proper usage";
 
     return 0;
 }

@@ -6,6 +6,7 @@
 using namespace std;
 
 [[noreturn]] int main(const int argc, char* argv[]) {
+
     if (argc != 1) {
         cerr << "Error reading from cache, cache may be malformed or tampered with." << "\n";
         return 1;

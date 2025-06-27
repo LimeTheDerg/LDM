@@ -1,5 +1,5 @@
-#ifndef HELPER_FUNCTIONS_H
-#define HELPER_FUNCTIONS_H
+#ifndef HELPER_FUNCTIONS_HPP
+#define HELPER_FUNCTIONS_HPP
 
 #include "../json/json.hpp"
 
@@ -27,9 +27,10 @@ inline nlohmann::json read_cache() {
     std::ifstream cache_file;
     cache_file.open(find_process_path() + "/daemon_cache.json");
     if (!cache_file.is_open()) {
-        std::cerr << "Failed to open cache file" << "\n";
+        throw std::runtime_error("Failed to open cache file");
     }
     nlohmann::json cache_json = nlohmann::json::parse(cache_file);
+    cache_file.close();
     return cache_json;
 }
 
@@ -51,7 +52,7 @@ inline std::vector<std::string> split_by_space(const std::string &s) {
 }
 
 inline program_state fork_execv_parent(const std::string& target, nlohmann::json &cache) {
-    pid_t pid = 0;//fork(); // Create a child process
+    pid_t pid = fork(); // Create a child process
 
     if (pid < 0) {
         std::cerr << "Something has gone catastrophically wrong.";
@@ -62,6 +63,7 @@ inline program_state fork_execv_parent(const std::string& target, nlohmann::json
     if (pid == 0) {
         std::string bin_name;
         int daemon_id = 0;
+
         // Find the daemon in the cache and save its id for later
         for (int i = 0; i < cache.size(); i++) {
             if (cache["daemons"][i]["name"] == target) {
@@ -74,7 +76,6 @@ inline program_state fork_execv_parent(const std::string& target, nlohmann::json
         const std::string bin_path = find_process_path() + "/daemons/" + bin_name;
         // Receive the arguments from the cache
         std::vector<std::string> arg_strs = split_by_space(cache["daemons"][daemon_id]["args"]);
-
         // Given the std::string vector, copy the contents into a new vector of c-style strings
         std::vector<char*> arg_ptrs;
         for (std::string& str : arg_strs) {
@@ -82,13 +83,23 @@ inline program_state fork_execv_parent(const std::string& target, nlohmann::json
         }
 
         arg_ptrs.push_back(nullptr); // execv expects a null-terminated array
-        std::cout << *(arg_ptrs.data());
-
         execv(bin_path.c_str(), arg_ptrs.data());
 
-        return CHILD; // Will not be run, but if I remove it CMake will yell at me
+        return CHILD; // Will not actually return if all goes smoothly, but if I remove it CMake will yell at me
     }
-    return PARENT;
+    return PARENT; // This is what tells the interface it should kill itself
+}
+
+inline void write_cache(nlohmann::json &cache) {
+    std::ofstream cache_file;
+    cache_file.open(find_process_path() + "/daemon_cache.json", std::ios::trunc);
+    if (!cache_file.is_open()) {
+      throw std::runtime_error("Failed to write cache file");
+    }
+
+    const std::string cache_json = cache.dump(1); // Creates an indented string using current cache in program
+    cache_file << cache_json; // Write to cache
+    cache_file.close();
 }
 
 #endif

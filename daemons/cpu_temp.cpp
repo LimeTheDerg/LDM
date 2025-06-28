@@ -2,15 +2,15 @@
 #include <iostream>
 #include <fstream>
 #include <thread>
-#include "daemon_function_wrapper.hpp"
+#include "daemon_comm_api.hpp"
 
 using namespace std;
 
 int main(const int argc, char* argv[]) {
     daemonize();
 
+
     if (argc != 1) {
-        cerr << "Error reading from cache, cache may be malformed or tampered with." << "\n";
         return 1;
     }
 
@@ -27,8 +27,7 @@ int main(const int argc, char* argv[]) {
                 std::cout << "cpu-temperature-monitor - [INFO] - Current CPU temperature is: " << temp_c << " degrees C." << "\n";
             }
         } else {
-            cerr << "Failed to read temperature." << endl; // In case of error, I don't want to see this...
+            return 1;
         }
-        this_thread::sleep_for(chrono::seconds(3)); // Wait for 3 seconds
     }
 }

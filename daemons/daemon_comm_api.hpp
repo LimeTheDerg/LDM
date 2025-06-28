@@ -1,9 +1,12 @@
 #ifndef DAEMON_FUNCTION_WRAPPER_HPP
 #define DAEMON_FUNCTION_WRAPPER_HPP
 
+#include <fcntl.h>
 #include <unistd.h>
 #include <linux/limits.h>
 #include <sys/stat.h>
+
+#define BUF_MAX 512
 
 inline std::string find_process_path() {
     char path[PATH_MAX];
@@ -37,6 +40,29 @@ inline void daemonize() {
     close(STDERR_FILENO);
 }
 
-inline void
+inline void write_fifo(const char* fifo, const std::string &content) {
+    int fifo_int = open(fifo, O_WRONLY | O_NONBLOCK);
+    write(fifo_int, content.c_str(), BUF_MAX);
+    close(fifo_int);
+}
+
+inline void read_kill_file() {
+
+}
+
+inline const char* open_fifo() {
+    const std::string fifo = find_process_path() + "/fifo";
+    const char** fifo_c = new const char*(fifo.c_str());
+    mkfifo(*fifo_c, 0666);
+    return *fifo_c;
+}
+
+inline void close_fifo() {
+
+}
+
+inline void log() {
+
+}
 
 #endif

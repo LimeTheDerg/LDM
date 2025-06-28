@@ -22,6 +22,11 @@ inline std::string find_process_path() {
     return "";
 }
 
+inline std::string find_fifo_path() {
+    std::string fifo_path = find_process_path() + "/fifo";
+    return fifo_path;
+}
+
 inline void daemonize() {
     // Set permissions for other files, owner can do anything it wishes, but everything else has read and execute access only
     umask(022);
@@ -40,8 +45,8 @@ inline void daemonize() {
     close(STDERR_FILENO);
 }
 
-inline void write_fifo(const char* fifo, const std::string &content) {
-    int fifo_int = open(fifo, O_WRONLY | O_NONBLOCK);
+inline void write_fifo(const char* fifo_path, const std::string &content) {
+    const int fifo_int = open(fifo_path, O_WRONLY | O_NONBLOCK);
     write(fifo_int, content.c_str(), BUF_MAX);
     close(fifo_int);
 }
@@ -50,15 +55,9 @@ inline void read_kill_file() {
 
 }
 
-inline const char* open_fifo() {
-    const std::string fifo = find_process_path() + "/fifo";
-    const char** fifo_c = new const char*(fifo.c_str());
-    mkfifo(*fifo_c, 0666);
-    return *fifo_c;
-}
-
-inline void close_fifo() {
-
+inline void open_fifo() {
+    const std::string fifo = find_fifo_path();
+    mkfifo(fifo.c_str(), 0666);
 }
 
 inline void log() {

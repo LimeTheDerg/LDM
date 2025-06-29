@@ -55,12 +55,7 @@ inline void read_kill_file() {
 
 }
 
-inline void open_fifo() {
-    const std::string fifo = find_fifo_path();
-    mkfifo(fifo.c_str(), 0666);
-}
-
-inline void log() {
+inline void log(std::string message) {
 
 }
 

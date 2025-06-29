@@ -56,7 +56,7 @@ inline void read_kill_file() {
 }
 
 inline void log(std::string message) {
-
+    
 }
 
 #endif

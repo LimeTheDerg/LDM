@@ -108,34 +108,10 @@ inline void write_cache(nlohmann::json &cache) {
     cache_file.close();
 }
 
-inline void init_termios() {
-    termios oldt{}, newt{};
-
-    // Get current terminal settings
-    tcgetattr(STDIN_FILENO, &oldt);
-    newt = oldt;
-
-    // Disable canonical mode and echo
-    newt.c_lflag &= ~(ICANON | ECHO);
-    // Set new terminal settings immediately
-    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+inline void listener_clean_exit(int sig) {
+    std::cout << "\n" << "Quitting..." << "\n";
+    const std::string path = find_process_path()+"/fifo";
+    unlink(path.c_str());
+    exit(0);
 }
-
-inline bool is_f10_pressed() {
-    char seq[6] = {};
-    read(STDIN_FILENO, &seq[0], 1);
-    if (seq[0] == '\033') {
-        read(STDIN_FILENO, &seq[1], 1);   // should be '['
-        read(STDIN_FILENO, &seq[2], 1);   // should be '2'
-        read(STDIN_FILENO, &seq[3], 1);   // should be '1'
-        read(STDIN_FILENO, &seq[4], 1);   // should be '~'
-        seq[5] = '\0';
-
-        if (memcmp(seq, "\033[21~", 5) == 0) {
-            return true;
-        }
-        return false;
-    }
-}
-
 #endif

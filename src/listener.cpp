@@ -1,3 +1,4 @@
+#include <csignal>
 #include <iostream>
 #include <bits/this_thread_sleep.h>
 #include <sys/stat.h>
@@ -9,7 +10,7 @@ using std::string;
 using std::cout;
 
 int main() {
-    init_termios();
+    std::signal(SIGINT, listener_clean_exit);  // Register signal handler
 
     // Create fifo
     const string fifo = find_process_path() + "/fifo";
@@ -18,17 +19,9 @@ int main() {
     char buffer[512];
 
     cout << "Opening daemon listener..." << "\n";
-    cout << "Press F10 to quit" << "\n";
+    cout << "Press Ctrl+C to quit" << "\n";
 
-    char esc_seq[6] = {0};
     while (true) {
-
-        if (is_f10_pressed()) {
-            unlink(fifo.c_str());
-            std::cout << "Quitting..." << "\n";
-            break;
-        }
-
         const int fifo_stream = open(fifo_c, O_RDONLY);
         read(fifo_stream, buffer, 512);
         cout << buffer;

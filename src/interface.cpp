@@ -95,6 +95,9 @@ int main(int argc, char *argv[]) {
                     cout << "Stopping daemon..." << "\n";
                     return 0;
                 }
+            } else {
+                cout << "Daemon not found." << "\n";
+                return 1;
             }
         }
     }
@@ -103,7 +106,7 @@ int main(int argc, char *argv[]) {
 
     }
 
-    cerr << "Invalid usage, wrong arguments. Run 'ldmi help' for proper usage";
+    cerr << "Invalid usage, wrong arguments. Run 'ldmi help' for proper usage" << "\n";
 
     return 0;
 }

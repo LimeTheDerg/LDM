@@ -12,6 +12,7 @@ using nlohmann::json;
 
 int main(int argc, char *argv[]) {
 
+    chdir(find_bin_path().c_str()); // Set working directory to solve inconsistencies
     clear_kill_file(); // Clear the kill file so processes don't stop unnecessarily
 
     // Checks to see if an adequate number of arguments were given
@@ -96,6 +97,10 @@ int main(int argc, char *argv[]) {
                 }
             }
         }
+    }
+
+    if (operation == "config" && argc == 3) {
+
     }
 
     cerr << "Invalid usage, wrong arguments. Run 'ldmi help' for proper usage";

@@ -125,7 +125,7 @@ inline void clear_kill_file() {
     kill.close();
 }
 
-inline void write_kill_file(std::string daemon) {
+inline void write_kill_file(const std::string& daemon) {
     std::ofstream kill;
     kill.open("kill", std::ios::trunc);
     kill << daemon;

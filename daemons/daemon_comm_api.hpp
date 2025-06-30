@@ -1,6 +1,7 @@
 #ifndef DAEMON_FUNCTION_WRAPPER_HPP
 #define DAEMON_FUNCTION_WRAPPER_HPP
 
+#include <cstring>
 #include <fcntl.h>
 #include <unistd.h>
 #include <linux/limits.h>
@@ -16,7 +17,7 @@ inline std::string find_process_path() {
     if (count != -1) {
         path[count] = '\0';
         const std::string path_str = path;
-        return path_str.substr(0, path_str.find_last_of('/'));
+        return path_str.substr(0, path_str.find_last_of('/')-8); // this will get the second last of '/' since /daemons is exactly 8 characters
     }
     exit(EXIT_FAILURE);
     return "";
@@ -28,8 +29,7 @@ inline std::string find_fifo_path() {
 }
 
 inline void daemonize() {
-    // Set permissions for other files, owner can do anything it wishes, but everything else has read and execute access only
-    umask(022);
+    umask(0);
     // Start a new session
     const pid_t sid = setsid();
 
@@ -45,9 +45,9 @@ inline void daemonize() {
     close(STDERR_FILENO);
 }
 
-inline void write_fifo(const char* fifo_path, const std::string &content) {
-    const int fifo_int = open(fifo_path, O_WRONLY | O_NONBLOCK);
-    write(fifo_int, content.c_str(), BUF_MAX);
+inline void write_fifo(const std::string &content) {
+    const int fifo_int = open(find_fifo_path().c_str(), O_WRONLY);
+    write(fifo_int, content.c_str(), content.size());
     close(fifo_int);
 }
 

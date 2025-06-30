@@ -3,7 +3,7 @@
 
 #include "../json/json.hpp"
 #include <fstream>
-#include <termios.h>
+#include <fcntl.h>
 
 enum program_state {
     PARENT,
@@ -103,7 +103,7 @@ inline void write_cache(nlohmann::json &cache) {
         exit(EXIT_FAILURE);
     }
 
-    const std::string cache_json = cache.dump(1); // Creates an indented string using current cache in program
+    const std::string cache_json = cache.dump(4); // Creates an indented string using current cache in program
     cache_file << cache_json; // Write to cache
     cache_file.close();
 }
@@ -112,6 +112,8 @@ inline void listener_clean_exit(int sig) {
     std::cout << "\n" << "Quitting..." << "\n";
     const std::string path = find_process_path()+"/fifo";
     unlink(path.c_str());
+    const int fifo_fd = open(path.c_str(), O_RDONLY);
+    close(fifo_fd);
     exit(0);
 }
 #endif

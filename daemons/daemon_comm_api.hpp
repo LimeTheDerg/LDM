@@ -1,5 +1,5 @@
-#ifndef DAEMON_FUNCTION_WRAPPER_HPP
-#define DAEMON_FUNCTION_WRAPPER_HPP
+#ifndef DAEMON_API
+#define DAEMON_API
 
 #include <cstring>
 #include <fcntl.h>
@@ -7,7 +7,7 @@
 #include <linux/limits.h>
 #include <sys/stat.h>
 
-#define BUF_MAX 512
+#define BUF_MAX 1024
 
 inline std::string find_process_path() {
     char path[PATH_MAX];

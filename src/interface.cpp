@@ -12,6 +12,8 @@ using nlohmann::json;
 
 int main(int argc, char *argv[]) {
 
+    clear_kill_file(); // Clear the kill file so processes don't stop unnecessarily
+
     // Checks to see if an adequate number of arguments were given
     if (argc > 3 || argc < 2) {
         cerr << "----------ERROR----------" << "\n" <<
@@ -48,6 +50,10 @@ int main(int argc, char *argv[]) {
             if (cache["daemons"][i]["name"] == target) {
                 isValid = true;
                 daemon_id = i;
+                // if (cache["daemons"][i]["status"] == "active") {
+                //     cout << "Daemon is already active." << "\n";
+                //     return 0;
+                // }
             }
         }
         if (!isValid) {
@@ -55,7 +61,7 @@ int main(int argc, char *argv[]) {
             return 1;
         }
         // Ensuring child process spawning works correctly.
-        program_state process_status = fork_execv_parent(target, cache);
+        const program_state process_status = fork_execv_parent(target, cache);
         if (process_status == ERROR) {
             cerr << "Error starting daemon.\n";
             return 1;
@@ -72,6 +78,24 @@ int main(int argc, char *argv[]) {
             return 0;
         }
         return 0;
+    }
+
+    if (operation == "stop" && argc == 3) {
+        for (int i = 0; i < cache.size(); i++) {
+            if (cache["daemons"][i]["name"] == target) {
+                if (cache["daemons"][i]["status"] == "inactive") {
+                    cout << "Daemon is already stopped." << "\n";
+                    return 0;
+                }
+                if (cache["daemons"][i]["status"] == "active") {
+                    write_kill_file(cache["daemons"][i]["bin"]);
+                    cache["daemons"][i]["status"] = "inactive";
+                    write_cache(cache);
+                    cout << "Stopping daemon..." << "\n";
+                    return 0;
+                }
+            }
+        }
     }
 
     cerr << "Invalid usage, wrong arguments. Run 'ldmi help' for proper usage";

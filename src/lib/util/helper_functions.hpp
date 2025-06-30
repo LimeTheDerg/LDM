@@ -11,7 +11,7 @@ enum program_state {
     ERROR
 };
 
-inline std::string find_process_path() {
+inline std::string find_bin_path() {
     char path[PATH_MAX];
     // The proc.self/exe symlink always points to the process that accesses it
     const ssize_t count = readlink("/proc/self/exe", path, sizeof(path) - 1);
@@ -28,7 +28,7 @@ inline std::string find_process_path() {
 
 inline nlohmann::json read_cache() {
     std::ifstream cache_file;
-    cache_file.open(find_process_path() + "/daemon_cache.json");
+    cache_file.open(find_bin_path() + "/daemon_cache.json");
     if (!cache_file.is_open()) {
         std::cerr << "Failed to open cache file" << "\n";
         exit(EXIT_FAILURE);
@@ -38,11 +38,11 @@ inline nlohmann::json read_cache() {
     return cache_json;
 }
 
-inline std::vector<std::string> split_by_space(const std::string &s) {
+inline std::vector<std::string> split_by_space(const std::string &s, const std::string &bin) {
     std::vector<std::string> arg_vector;
     std::string arg;
-
     // Algorithm to search through string for whitespace and push the word to vector if found
+    arg_vector.push_back(bin);
     for (int i = 0; i < s.length(); i++) {
         if (s[i] == ' ') {
             arg_vector.push_back(arg);
@@ -77,9 +77,9 @@ inline program_state fork_execv_parent(const std::string& target, nlohmann::json
         }
 
         // Find the bin's full path
-        const std::string bin_path = find_process_path() + "/daemons/" + bin_name;
+        const std::string bin_path = find_bin_path() + "/daemons/" + bin_name;
         // Receive the arguments from the cache
-        std::vector<std::string> arg_strs = split_by_space(cache["daemons"][daemon_id]["args"]);
+        std::vector<std::string> arg_strs = split_by_space(cache["daemons"][daemon_id]["args"], cache["daemons"][daemon_id]["bin"]);
         // Given the std::string vector, copy the contents into a new vector of c-style strings
         std::vector<char*> arg_ptrs;
         for (std::string& str : arg_strs) {
@@ -96,7 +96,7 @@ inline program_state fork_execv_parent(const std::string& target, nlohmann::json
 
 inline void write_cache(nlohmann::json &cache) {
     std::ofstream cache_file;
-    cache_file.open(find_process_path() + "/daemon_cache.json", std::ios::trunc);
+    cache_file.open(find_bin_path() + "/daemon_cache.json", std::ios::trunc);
 
     if (!cache_file.is_open()) {
         std::cerr << "Failed to write to cache file" << "\n";
@@ -110,10 +110,25 @@ inline void write_cache(nlohmann::json &cache) {
 
 inline void listener_clean_exit(int sig) {
     std::cout << "\n" << "Quitting..." << "\n";
-    const std::string path = find_process_path()+"/fifo";
+    const std::string path = find_bin_path()+"/fifo";
     unlink(path.c_str());
     const int fifo_fd = open(path.c_str(), O_RDONLY);
     close(fifo_fd);
     exit(0);
+}
+
+inline void clear_kill_file() {
+    std::ofstream kill;
+    kill.open("kill", std::ios::trunc);
+    const std::string garbage;
+    kill << garbage;
+    kill.close();
+}
+
+inline void write_kill_file(std::string daemon) {
+    std::ofstream kill;
+    kill.open("kill", std::ios::trunc);
+    kill << daemon;
+    kill.close();
 }
 #endif

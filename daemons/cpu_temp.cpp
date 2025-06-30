@@ -3,7 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <thread>
-#include "daemon_comm_api.hpp"
+#include "daemon_api.hpp"
 
 using namespace std;
 

@@ -29,13 +29,15 @@ int main(int argc, char *argv[]) {
 
 
     if (operation == "help" && argc == 2) {
-        // TODO: Create help.txt file and read from it here.
+        std::ifstream helpfile;
+        helpfile.open("help", std::ios::in);
+        cout << helpfile.rdbuf() << "\n";
         return 0;
     }
 
     if (operation == "list" && argc == 2) {
         cout << "Available daemons:" << "\n";
-        for (int i = 0; i < cache.size(); i++) {
+        for (int i = 0; i < cache.size()+1; i++) {
             const string str = cache["daemons"][i]["name"];
             cout << str << "\n";
         }
@@ -47,14 +49,14 @@ int main(int argc, char *argv[]) {
         cout << "Starting daemon: " << target << "..." << "\n";
         // Search cache if daemon is available, error if not.
         bool isValid = false;
-        for (int i = 0; i < cache.size(); i++) {
+        for (int i = 0; i < cache.size()+1; i++) {
             if (cache["daemons"][i]["name"] == target) {
                 isValid = true;
                 daemon_id = i;
-                // if (cache["daemons"][i]["status"] == "active") {
-                //     cout << "Daemon is already active." << "\n";
-                //     return 0;
-                // }
+                if (cache["daemons"][i]["status"] == "active") {
+                    cout << "Daemon is already active." << "\n";
+                    return 0;
+                }
             }
         }
         if (!isValid) {
@@ -82,8 +84,10 @@ int main(int argc, char *argv[]) {
     }
 
     if (operation == "stop" && argc == 3) {
-        for (int i = 0; i < cache.size(); i++) {
+        bool isValid = false;
+        for (int i = 0; i < cache.size()+1; i++) {
             if (cache["daemons"][i]["name"] == target) {
+                isValid = true;
                 if (cache["daemons"][i]["status"] == "inactive") {
                     cout << "Daemon is already stopped." << "\n";
                     return 0;
@@ -95,26 +99,61 @@ int main(int argc, char *argv[]) {
                     cout << "Stopping daemon..." << "\n";
                     return 0;
                 }
-            } else {
-                cout << "Daemon not found." << "\n";
-                return 1;
             }
+        }
+        if (!isValid) {
+            cerr << "Daemon not found. Run 'ldmi list' for a list of available daemons." << "\n";
+            return 1;
         }
     }
 
     if (operation == "config" && argc == 3) {
-        for (int i = 0; i < cache.size(); i++) {
+        bool isValid = false;
+        for (int i = 0; i < cache.size()+1; i++) {
             if (cache["daemons"][i]["name"] == target) {
+                isValid = true;
                 cout << "Enter your configuration here, here is the specification:" << "\n";
+                cout << "Ensure that the arguments are space separated." << "\n";
                 const string conf_msg = cache["daemons"][i]["conf_msg"];
                 cout << conf_msg << "\n";
                 string arguments;
-                std::cin >> arguments;
+                std::getline(std::cin, arguments);
                 cache["daemons"][i]["args"] = arguments;
                 write_cache(cache);
                 cout << "Configuration set. Stopping." << "\n";
                 return 0;
             }
+        }
+        if (!isValid) {
+            cerr << "Daemon not found. Run 'ldmi list' for a list of available daemons." << "\n";
+            return 1;
+        }
+    }
+
+    if (operation == "send" && argc == 3) {
+        bool isValid = false;
+        for (int i = 0; i < cache.size()+1; i++) {
+            if (cache["daemons"][i]["name"] == target) {
+                isValid = true;
+                if (cache["daemons"][i]["status"] == "inactive") {
+                    cout << "Daemon is not active." << "\n";
+                    return 0;
+                }
+                cout << "Enter the message you would like to send:" << "\n";
+                std::ofstream sendfile;
+                sendfile.open("send", std::ios::out | std::ios::app);
+                string message;
+                std::cin >> message;
+                string bin = cache["daemons"][i]["bin"];
+                sendfile << bin << "\n";
+                sendfile << message;
+                sendfile.close();
+                return 0;
+            }
+        }
+        if (!isValid) {
+            cerr << "Daemon not found. Run 'ldmi list' for a list of available daemons." << "\n";
+            return 1;
         }
     }
 

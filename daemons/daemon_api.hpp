@@ -3,6 +3,7 @@
 
 #include <cstring>
 #include <fcntl.h>
+#include <fstream>
 #include <sstream>
 #include <unistd.h>
 #include <linux/limits.h>
@@ -105,6 +106,30 @@ inline void read_kill_file() {
         exit(0);
     }
     kill_file.close();
+}
+
+inline std::string read_send_file() {
+    std::ifstream send_file;
+    send_file.open("send", std::ios::in);
+    if (!send_file.is_open()) {
+        daemon_api_log("[ERROR] - FAILED TO READ SEND FILE: " + bin_name);
+    }
+    // Reads the first line o fthe sendfile which will be the target of the send operation
+    std::string target;
+    std::getline(send_file, target);
+    if (target == bin_name) { // If this daemon is the target
+        // Put the content into a string
+        std::string content;
+        std::getline(send_file, content);
+        send_file.close();
+        // Empty the file
+        std::ofstream send_file_o;
+        send_file_o.open("send", std::ios::trunc);
+        const std::string garbage;
+        send_file_o << garbage;
+        return content; // Return
+    }
+    return "";
 }
 
 #endif

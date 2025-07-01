@@ -4,8 +4,17 @@
       "name": "cpu-temperature-monitor",
       "bin": "cpu_temp",
       "status": "inactive",
-      "conf_msg": "<cpu-temp-warn-threshold>",
+      "conf_msg": "<cpu-temp-warn-threshold-degrees-c>",
+      "help": "",
       "args": "90"
+    },
+    {
+      "name": "vault",
+      "bin": "vault",
+      "status": "inactive",
+      "conf_msg": "<clear-vault-delay-seconds> <default-value>",
+      "help": "",
+      "args": "300"
     }
   ]
 }

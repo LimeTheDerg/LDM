@@ -1,5 +1,4 @@
 #include <chrono>
-#include <cmath>
 #include <fstream>
 #include <thread>
 #include "daemon_api.hpp"

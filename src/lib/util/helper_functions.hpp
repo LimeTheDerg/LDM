@@ -69,7 +69,7 @@ inline program_state fork_execv_parent(const std::string& target, nlohmann::json
         int daemon_id = 0;
 
         // Find the daemon in the cache and save its id for later
-        for (int i = 0; i < cache.size(); i++) {
+        for (int i = 0; i < cache.size()+1; i++) {
             if (cache["daemons"][i]["name"] == target) {
                 bin_name = cache["daemons"][i]["bin"];
                 daemon_id = i;

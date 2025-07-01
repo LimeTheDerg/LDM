@@ -103,7 +103,19 @@ int main(int argc, char *argv[]) {
     }
 
     if (operation == "config" && argc == 3) {
-
+        for (int i = 0; i < cache.size(); i++) {
+            if (cache["daemons"][i]["name"] == target) {
+                cout << "Enter your configuration here, here is the specification:" << "\n";
+                const string conf_msg = cache["daemons"][i]["conf_msg"];
+                cout << conf_msg << "\n";
+                string arguments;
+                std::cin >> arguments;
+                cache["daemons"][i]["args"] = arguments;
+                write_cache(cache);
+                cout << "Configuration set. Stopping." << "\n";
+                return 0;
+            }
+        }
     }
 
     cerr << "Invalid usage, wrong arguments. Run 'ldmi help' for proper usage" << "\n";

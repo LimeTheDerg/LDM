@@ -4,8 +4,8 @@
       "name": "cpu-temperature-monitor",
       "bin": "cpu_temp",
       "status": "inactive",
-      "conf_msg": "cpu-temp-warn-threshold",
-      "args": "70"
+      "conf_msg": "<cpu-temp-warn-threshold>",
+      "args": "90"
     }
   ]
 }

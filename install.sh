@@ -16,7 +16,8 @@ export PATH="$PATH:$BIN_PATH"
 
 if ! grep -qF "$BIN_PATH" "$HOME/.bashrc"; then
   echo "export PATH=\"$BIN_PATH:\$PATH\"" >> "$HOME/.bashrc"
-  echo "Added $BIN_PATH to PATH in $HOME/.bashrc"
+  echo "Installed LDM successfully."
 else
-  echo "$BIN_PATH already in $HOME/.bashrc"
+  echo "LDM seems to already exist on your system."
+  rm -rf LDM
 fi

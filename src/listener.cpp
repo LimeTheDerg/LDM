@@ -14,10 +14,7 @@ int main() {
 
     // Create fifo
     const string fifo = find_bin_path() + "/fifo";
-    int fifo_int = mkfifo(fifo.c_str(), 0666);
-    if (fifo_int == -1) {
-        std::cerr << "Error creating FIFO, please try again." << "\n";
-    }
+    mkfifo(fifo.c_str(), 0666);
 
     cout << "Opening daemon listener..." << "\n";
     cout << "Press Ctrl+C to quit" << "\n";

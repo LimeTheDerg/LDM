@@ -28,6 +28,7 @@ int main() {
         if (bytes_read > 0) {
             cout << buffer << std::flush; // Flush is mandatory, printing will not work without it
         }
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
     return 0;
 }

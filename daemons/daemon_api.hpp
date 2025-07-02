@@ -123,6 +123,11 @@ inline void read_kill_file() {
         exit(0);
     }
     kill_file.close();
+    std::ofstream kill;
+    kill.open("kill", std::ios::trunc);
+    const std::string garbage;
+    kill << garbage;
+    kill.close();
 }
 
 /**
@@ -137,7 +142,7 @@ inline std::string read_send_file() {
     if (!send_file.is_open()) {
         daemon_api_log("[ERROR] - FAILED TO READ SEND FILE: " + bin_name);
     }
-    // Reads the first line o fthe sendfile which will be the target of the send operation
+    // Reads the first line of the sendfile which will be the target of the send operation
     std::string target;
     std::getline(send_file, target);
     if (target == bin_name) { // If this daemon is the target

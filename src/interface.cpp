@@ -17,7 +17,6 @@ int main(int argc, char *argv[]) {
         cout << "Unable to set working directory." << "\n";
         return 1;
     }
-    clear_kill_file(); // Clear the kill file so processes don't stop unnecessarily
 
     // Checks to see if an adequate number of arguments were given
     if (argc > 3 || argc < 2) {

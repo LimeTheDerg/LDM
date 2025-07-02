@@ -117,14 +117,6 @@ inline void listener_clean_exit(int sig) {
     exit(0);
 }
 
-inline void clear_kill_file() {
-    std::ofstream kill;
-    kill.open("kill", std::ios::trunc);
-    const std::string garbage;
-    kill << garbage;
-    kill.close();
-}
-
 inline void write_kill_file(const std::string& daemon) {
     std::ofstream kill;
     kill.open("kill", std::ios::trunc);

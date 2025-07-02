@@ -21,3 +21,4 @@ else
   echo "LDM seems to already exist on your system."
   rm -rf LDM
 fi
+echo "Reopen terminal for changes to take effect."

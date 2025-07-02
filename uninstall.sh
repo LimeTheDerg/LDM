@@ -12,4 +12,4 @@ cp "$HOME/.bashrc" "$HOME/.bashrc.backup"
 
 grep -vF "$BIN_PATH" "$HOME/.bashrc" > "$HOME/.bashrc.tmp" && mv "$HOME/.bashrc.tmp" "$HOME/.bashrc" || echo "An error has occurred when trying to remove LDM from PATH"
 echo "Removal complete, ~/.bashrc has been modified, and if something has gone wrong, there is a backup at ~/.bashrc.backup"
-
+echo "Reopen terminal for changes to take effect."

@@ -12,6 +12,18 @@
 inline std::string bin_name;
 
 /**
+ * Simple algorithm to find the bin name using the current path.
+ * It works by shaving off anything before the last '/' character.
+ * This is to be used primarily by the API itself, but you may use it if needed.
+ * @param path the absolute path of the bin
+ * @return the name of the bin
+ */
+inline std::string get_bin_name_from_path(const std::string& path) {
+    std::string result = path.substr(path.find_last_of('/') + 1);
+    return result;
+}
+
+/**
  * Method for logging. Adds the contents of message to the log file located in the bin path.
  * Useful for error logging.
  * @param message The log message.
@@ -55,7 +67,7 @@ inline std::string find_fifo_path() {
  * Method for turing the process image into a proper daemon.
  */
 inline void daemonize(const char* bin) {
-    bin_name = bin;
+    bin_name = get_bin_name_from_path(bin);
 
     umask(0);
     // Start a new session
@@ -69,7 +81,11 @@ inline void daemonize(const char* bin) {
     }
 
     // Change the working directory to bin path
-    chdir(find_bin_path().c_str());
+    int dir = chdir(find_bin_path().c_str());
+    if (dir < 0) {
+        daemon_api_log("[ERROR] - FAILED TO DAEMONIZE: " + bin_name);
+        exit(EXIT_FAILURE);
+    }
     // Daemons should not be able to access stdout
     close(STDIN_FILENO);
     close(STDOUT_FILENO);
@@ -99,6 +115,7 @@ inline void read_kill_file() {
     kill_file.open("kill", std::ios::in);
     if (!kill_file.is_open()) {
         daemon_api_log("[ERROR] - FAILED TO READ KILL FILE: " + bin_name);
+        exit(EXIT_FAILURE);
     }
     std::stringstream name;
     name << kill_file.rdbuf();
@@ -108,6 +125,12 @@ inline void read_kill_file() {
     kill_file.close();
 }
 
+/**
+ * IPC method. \n
+ * Reads the sendfile populated by the interface for information and checks if it meant for this daemon.
+ * If meant for this daemon, it will return the contents of the message.
+ * @return The contents of the message.
+ */
 inline std::string read_send_file() {
     std::ifstream send_file;
     send_file.open("send", std::ios::in);

@@ -1,20 +1,20 @@
 {
   "daemons": [
     {
-      "name": "cpu-temperature-monitor",
+      "args": "90",
       "bin": "cpu_temp",
-      "status": "inactive",
       "conf_msg": "<cpu-temp-warn-threshold-degrees-c>",
-      "help": "",
-      "args": "90"
+      "help": "\nDESCRIPTION:\nA simple CPU temperature monitor that warns you when your CPU temperature goes over a certain threshold.\nCONFIG:\n<cpu-temp-warn-threshold-degrees-c>\nHas only one argument, which is the threshold at which the user will be warned. When this threshold is crossed, a warning message will be sent to the listener. It is in degrees celsius.\nSENDING:\nThis daemon does not support sending.\n",
+      "name": "cpu-temperature-monitor",
+      "status": "inactive"
     },
     {
-      "name": "vault",
+      "args": "300 empty",
       "bin": "vault",
-      "status": "inactive",
       "conf_msg": "<clear-vault-delay-seconds> <default-value>",
-      "help": "",
-      "args": "300"
+      "help": "\nDESCRIPTION:\nA vault that stores sensitive information that will be cleared periodically, at termination, or system shutdown.\nCONFIG:\n<clear-vault-delay-seconds> <default-value>\nThe clear vault delay argument is the amount of time between vault clears in seconds. The vault will store the default content when cleared.\nThe default value argument is the default content the vault will store when starting and after clearing.\nSENDING:\nAny information sent to this daemon will set the vault's contents to the information given, an exception is the word 'view' on its own, which will print the contents of the vault to the listener.\n",
+      "name": "vault",
+      "status": "inactive"
     }
   ]
 }

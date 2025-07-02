@@ -12,7 +12,11 @@ using nlohmann::json;
 
 int main(int argc, char *argv[]) {
 
-    chdir(find_bin_path().c_str()); // Set working directory to solve inconsistencies
+    int dir = chdir(find_bin_path().c_str()); // Set working directory to solve inconsistencies
+    if (dir < 0) {
+        cout << "Unable to set working directory." << "\n";
+        return 1;
+    }
     clear_kill_file(); // Clear the kill file so processes don't stop unnecessarily
 
     // Checks to see if an adequate number of arguments were given
@@ -37,7 +41,7 @@ int main(int argc, char *argv[]) {
 
     if (operation == "list" && argc == 2) {
         cout << "Available daemons:" << "\n";
-        for (int i = 0; i < cache.size()+1; i++) {
+        for (int i = 0; i < cache["daemons"].size(); i++) {
             const string str = cache["daemons"][i]["name"];
             cout << str << "\n";
         }
@@ -49,7 +53,7 @@ int main(int argc, char *argv[]) {
         cout << "Starting daemon: " << target << "..." << "\n";
         // Search cache if daemon is available, error if not.
         bool isValid = false;
-        for (int i = 0; i < cache.size()+1; i++) {
+        for (int i = 0; i < cache["daemons"].size(); i++) {
             if (cache["daemons"][i]["name"] == target) {
                 isValid = true;
                 daemon_id = i;
@@ -85,7 +89,7 @@ int main(int argc, char *argv[]) {
 
     if (operation == "stop" && argc == 3) {
         bool isValid = false;
-        for (int i = 0; i < cache.size()+1; i++) {
+        for (int i = 0; i < cache["daemons"].size(); i++) {
             if (cache["daemons"][i]["name"] == target) {
                 isValid = true;
                 if (cache["daemons"][i]["status"] == "inactive") {
@@ -109,9 +113,12 @@ int main(int argc, char *argv[]) {
 
     if (operation == "config" && argc == 3) {
         bool isValid = false;
-        for (int i = 0; i < cache.size()+1; i++) {
+        for (int i = 0; i < cache["daemons"].size(); i++) {
             if (cache["daemons"][i]["name"] == target) {
                 isValid = true;
+                string current_conf = cache["daemons"][i]["args"];
+                cout << "This is your current configuration:" << "\n";
+                cout << current_conf << "\n";
                 cout << "Enter your configuration here, here is the specification:" << "\n";
                 cout << "Ensure that the arguments are space separated." << "\n";
                 const string conf_msg = cache["daemons"][i]["conf_msg"];
@@ -132,7 +139,7 @@ int main(int argc, char *argv[]) {
 
     if (operation == "send" && argc == 3) {
         bool isValid = false;
-        for (int i = 0; i < cache.size()+1; i++) {
+        for (int i = 0; i < cache["daemons"].size(); i++) {
             if (cache["daemons"][i]["name"] == target) {
                 isValid = true;
                 if (cache["daemons"][i]["status"] == "inactive") {
@@ -141,13 +148,29 @@ int main(int argc, char *argv[]) {
                 }
                 cout << "Enter the message you would like to send:" << "\n";
                 std::ofstream sendfile;
-                sendfile.open("send", std::ios::out | std::ios::app);
+                sendfile.open("send", std::ios::out | std::ios::trunc);
                 string message;
                 std::cin >> message;
                 string bin = cache["daemons"][i]["bin"];
                 sendfile << bin << "\n";
                 sendfile << message;
                 sendfile.close();
+                return 0;
+            }
+        }
+        if (!isValid) {
+            cerr << "Daemon not found. Run 'ldmi list' for a list of available daemons." << "\n";
+            return 1;
+        }
+    }
+
+    if (operation == "help" && argc == 3) {
+        bool isValid = false;
+        for (int i = 0; i < cache["daemons"].size(); i++) {
+            if (cache["daemons"][i]["name"] == target) {
+                isValid = true;
+                string help = cache["daemons"][i]["help"];
+                cout << help << "\n";
                 return 0;
             }
         }

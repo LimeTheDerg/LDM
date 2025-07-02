@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
             std::string send_file_content = read_send_file();
             if (!send_file_content.empty()) {
                 if (send_file_content == "view") {
-                    write_fifo("vault - [INFO] - The vault's current contents are: " + content + "\n");
+                    write_fifo("vault - [INFO] - The vault's current contents are: " + content + "\n\n");
                 } else {
                     content = send_file_content;
                     i = 1;

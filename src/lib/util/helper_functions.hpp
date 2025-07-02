@@ -68,8 +68,8 @@ inline program_state fork_execv_parent(const std::string& target, nlohmann::json
         std::string bin_name;
         int daemon_id = 0;
 
-        // Find the daemon in the cache and save its id for later
-        for (int i = 0; i < cache.size()+1; i++) {
+        // Find the daemon in the cache and save its id and bin for later
+        for (int i = 0; i < cache["daemons"].size(); i++) {
             if (cache["daemons"][i]["name"] == target) {
                 bin_name = cache["daemons"][i]["bin"];
                 daemon_id = i;
@@ -79,7 +79,7 @@ inline program_state fork_execv_parent(const std::string& target, nlohmann::json
         // Find the bin's full path
         const std::string bin_path = find_bin_path() + "/daemons/" + bin_name;
         // Receive the arguments from the cache
-        std::vector<std::string> arg_strs = split_by_space(cache["daemons"][daemon_id]["args"], cache["daemons"][daemon_id]["bin"]);
+        std::vector<std::string> arg_strs = split_by_space(cache["daemons"][daemon_id]["args"], bin_path);
         // Given the std::string vector, copy the contents into a new vector of c-style strings
         std::vector<char*> arg_ptrs;
         for (std::string& str : arg_strs) {
@@ -88,8 +88,8 @@ inline program_state fork_execv_parent(const std::string& target, nlohmann::json
 
         arg_ptrs.push_back(nullptr); // execv expects a null-terminated array
         execv(bin_path.c_str(), arg_ptrs.data());
-
-        return CHILD; // Will not actually return if all goes smoothly, but if I remove it CMake will yell at me
+        
+        return ERROR; // Will not actually return if all goes smoothly
     }
     return PARENT; // This is what tells the interface it should kill itself
 }

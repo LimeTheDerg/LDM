@@ -1,0 +1,56 @@
+
+**********LIME'S DAEMON MANAGER**********
+Lime's daemon manager, or simply LDM is a lightweight and easy to use daemon managing CLI application. It is capable of starting/stopping/configuring several different daemon binaries
+and listening to them all at once through the listener.
+
+Furthermore, users can create their own daemons very easily with the help of the daemon API. Refer to the proper documentation at: https://github.com/LimeTheDerg/LDM
+
+The tool is split up into two programs, the interface and the listener. The interface is responsible for spawning, killing, and configuring daemons while
+the listener is responsible for listening to all active daemons at once.
+
+COMMANDS:
+    ldmi - The interface, used to start, stop, and configure daemons.
+    ldml - The listener, listens to all active daemons and relays information to the user in the command line.
+
+INTERFACE USAGE:
+    ldmi help
+        Displays this message
+
+    ldmi list
+        Displays all available daemons
+
+    ldmi start <daemon-name>
+        Starts the daemon with name <daemon-name>
+        EXAMPLE: ldmi start cpu-temperature-monitor
+
+    ldmi stop <daemon-name>
+        Terminates the daemon with name <daemon-name>
+        EXAMPLE: ldmi stop cpu-temperature-monitor
+
+    ldmi config <daemon-name>
+        Displays the configuration specification of <daemon-name> and requests a configuration from the user where arguments are space separated
+        Then configures the daemon with name <daemon-name>
+        Daemons must be restarted for the config to take effect
+        Refer to daemon documentation or use intuition
+        EXAMPLE:
+        ldmi config vault
+        >>> <clear-vault-delay-seconds> <default-value>
+        300 empty
+
+    ldmi send <daemon-name>
+        Asks the user for the message they would like to send
+        Sends the message to <daemon-name>
+        EXAMPLE:
+        ldmi send vault
+        >> Enter the message you would like to send:
+        password123
+
+    ldmi help <daemon-name>
+        Displays information about the daemon, with its description and specifications
+
+LISTENER USAGE:
+    ldml
+        Opens the listener to read messages from all active daemons
+        The listener does not take any input
+
+**********END**********

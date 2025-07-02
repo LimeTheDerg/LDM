@@ -119,15 +119,14 @@ inline void read_kill_file() {
     }
     std::stringstream name;
     name << kill_file.rdbuf();
+    kill_file.close();
     if (name.str() == bin_name) {
+        std::ofstream kill;
+        kill.open("kill", std::ios::trunc);
+        const std::string garbage;
+        kill << garbage;
         exit(0);
     }
-    kill_file.close();
-    std::ofstream kill;
-    kill.open("kill", std::ios::trunc);
-    const std::string garbage;
-    kill << garbage;
-    kill.close();
 }
 
 /**

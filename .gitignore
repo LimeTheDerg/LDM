@@ -31,7 +31,6 @@
 *.out
 *.app
 
-cmake-build-build
+cmake-build-release
 cmake-build-debug
 .idea
-bin

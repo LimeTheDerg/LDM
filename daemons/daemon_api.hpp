@@ -75,7 +75,7 @@ inline void daemonize(const char* bin) {
 
     if (sid < 0) {
         std::stringstream error;
-        error << "[ERROR] - FAILED TO DAEMONIZE: " << bin;
+        error << "[ERROR] - FAILED TO DAEMONIZE: " << bin_name;
         daemon_api_log(error.str());
         exit(EXIT_FAILURE);
     }
@@ -100,6 +100,9 @@ inline void daemonize(const char* bin) {
  */
 inline void write_fifo(const std::string &content) {
     const int fifo_int = open(find_fifo_path().c_str(), O_WRONLY);
+    if (fifo_int < 0) {
+        daemon_api_log("[ERROR] - FAILED TO WRITE FIFO: " + bin_name);
+    }
     write(fifo_int, content.c_str(), content.size());
     close(fifo_int);
 }

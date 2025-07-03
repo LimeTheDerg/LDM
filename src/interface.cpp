@@ -149,7 +149,7 @@ int main(int argc, char *argv[]) {
                 std::ofstream sendfile;
                 sendfile.open("send", std::ios::out | std::ios::trunc);
                 string message;
-                std::cin >> message;
+                getline(std::cin, message);
                 string bin = cache["daemons"][i]["bin"];
                 sendfile << bin << "\n";
                 sendfile << message;

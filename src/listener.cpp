@@ -19,7 +19,7 @@ int main() {
     cout << "Opening daemon listener..." << "\n";
     cout << "Press Ctrl+C to quit" << "\n";
 
-    const int fifo_stream = open(fifo.c_str(), O_RDONLY | O_NONBLOCK);
+    const int fifo_stream = open(fifo.c_str(), O_RDONLY);
 
     while (true) {
         char buffer[4096]; // Create the buffer

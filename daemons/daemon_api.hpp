@@ -99,10 +99,7 @@ inline void daemonize(const char* bin) {
  * @param content The message to be sent to the main FIFO.
  */
 inline void write_fifo(const std::string &content) {
-    const int fifo_int = open(find_fifo_path().c_str(), O_WRONLY);
-    if (fifo_int < 0) {
-        daemon_api_log("[ERROR] - FAILED TO WRITE FIFO: " + bin_name);
-    }
+    const int fifo_int = open(find_fifo_path().c_str(), O_WRONLY | O_NONBLOCK);
     write(fifo_int, content.c_str(), content.size());
     close(fifo_int);
 }

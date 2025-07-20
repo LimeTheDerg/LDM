@@ -1,6 +1,3 @@
-#ifndef DAEMON_API
-#define DAEMON_API
-
 #include <cstring>
 #include <fcntl.h>
 #include <fstream>
@@ -8,8 +5,7 @@
 #include <unistd.h>
 #include <linux/limits.h>
 #include <sys/stat.h>
-
-inline std::string bin_name;
+#include "daemon_api.h"
 
 /**
  * Simple algorithm to find the bin name using the current path.
@@ -18,7 +14,7 @@ inline std::string bin_name;
  * @param path the absolute path of the bin
  * @return the name of the bin
  */
-inline std::string get_bin_name_from_path(const std::string& path) {
+std::string get_bin_name_from_path(const std::string& path) {
     std::string result = path.substr(path.find_last_of('/') + 1);
     return result;
 }
@@ -28,7 +24,7 @@ inline std::string get_bin_name_from_path(const std::string& path) {
  * Useful for error logging.
  * @param message The log message.
  */
-inline void daemon_api_log(const std::string& message) {
+void daemon_api_log(const std::string& message) {
     std::ofstream log;
     log.open("log", std::ios::app);
     log << message << "\n";
@@ -39,7 +35,7 @@ inline void daemon_api_log(const std::string& message) {
  * Method for finding the absolute path of the bin directory where all binaries, caches, and FIFOs are located.
  * @returns A std::string which contains the binary path.
  */
-inline std::string find_bin_path() {
+std::string find_bin_path() {
     char path[PATH_MAX];
     // The proc.self/exe symlink always points to the process that accesses it
     const ssize_t count = readlink("/proc/self/exe", path, sizeof(path) - 1);
@@ -57,7 +53,7 @@ inline std::string find_bin_path() {
  * Method for finding the absolute path of the main IPC FIFO.
  * @return A std::string which contains the FIFO path.
  */
-inline std::string find_fifo_path() {
+std::string find_fifo_path() {
     std::string fifo_path = find_bin_path() + "/fifo";
     return fifo_path;
 }
@@ -66,7 +62,7 @@ inline std::string find_fifo_path() {
  * MUST BE PLACED AT TOP OF DAEMON SOURCE CODE \n
  * Method for turing the process image into a proper daemon.
  */
-inline void daemonize(const char* bin) {
+void daemonize(const char* bin) {
     bin_name = get_bin_name_from_path(bin);
 
     umask(0);
@@ -98,7 +94,7 @@ inline void daemonize(const char* bin) {
  * Note: writing more than 4096 bytes to the FIFO will result in jumbled results.
  * @param content The message to be sent to the main FIFO.
  */
-inline void write_fifo(const std::string &content) {
+void write_fifo(const std::string &content) {
     const int fifo_int = open(find_fifo_path().c_str(), O_WRONLY | O_NONBLOCK);
     write(fifo_int, content.c_str(), content.size());
     close(fifo_int);
@@ -110,7 +106,7 @@ inline void write_fifo(const std::string &content) {
  * Reads from the kill file located in the binary path. If the name of the process is found in the kill file, the daemon will exit.
  * This is what allows the daemon to stop properly.
  */
-inline void read_kill_file() {
+void read_kill_file() {
     std::ifstream kill_file;
     kill_file.open("kill", std::ios::in);
     if (!kill_file.is_open()) {
@@ -135,7 +131,7 @@ inline void read_kill_file() {
  * If meant for this daemon, it will return the contents of the message.
  * @return The contents of the message.
  */
-inline std::string read_send_file() {
+std::string read_send_file() {
     std::ifstream send_file;
     send_file.open("send", std::ios::in);
     if (!send_file.is_open()) {
@@ -158,5 +154,3 @@ inline std::string read_send_file() {
     }
     return "";
 }
-
-#endif

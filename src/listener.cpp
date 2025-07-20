@@ -4,7 +4,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include "lib/util/helper_functions.hpp"
+#include "lib/util/helper_functions.h"
 
 using std::string;
 using std::cout;

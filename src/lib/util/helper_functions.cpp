@@ -1,17 +1,10 @@
-#ifndef HELPER_FUNCTIONS_HPP
-#define HELPER_FUNCTIONS_HPP
-
 #include "../json/json.hpp"
 #include <fstream>
 #include <fcntl.h>
+#include <iostream>
+#include "helper_functions.h"
 
-enum program_state {
-    PARENT,
-    CHILD,
-    ERROR
-};
-
-inline std::string find_bin_path() {
+std::string find_bin_path() {
     char path[PATH_MAX];
     // The proc.self/exe symlink always points to the process that accesses it
     const ssize_t count = readlink("/proc/self/exe", path, sizeof(path) - 1);
@@ -26,7 +19,7 @@ inline std::string find_bin_path() {
     return "";
 }
 
-inline nlohmann::json read_cache() {
+nlohmann::json read_cache() {
     std::ifstream cache_file;
     cache_file.open(find_bin_path() + "/daemon_cache.json");
     if (!cache_file.is_open()) {
@@ -38,7 +31,7 @@ inline nlohmann::json read_cache() {
     return cache_json;
 }
 
-inline std::vector<std::string> split_by_space(const std::string &s, const std::string &bin) {
+std::vector<std::string> split_by_space(const std::string &s, const std::string &bin) {
     std::vector<std::string> arg_vector;
     std::string arg;
     // Algorithm to search through string for whitespace and push the word to vector if found
@@ -55,7 +48,7 @@ inline std::vector<std::string> split_by_space(const std::string &s, const std::
     return arg_vector;
 }
 
-inline program_state fork_execv_parent(const std::string& target, nlohmann::json &cache) {
+program_state fork_execv_parent(const std::string& target, nlohmann::json &cache) {
     pid_t pid = fork(); // Create a child process
 
     if (pid < 0) {
@@ -88,13 +81,13 @@ inline program_state fork_execv_parent(const std::string& target, nlohmann::json
 
         arg_ptrs.push_back(nullptr); // execv expects a null-terminated array
         execv(bin_path.c_str(), arg_ptrs.data());
-        
+
         return ERROR; // Will not actually return if all goes smoothly
     }
     return PARENT; // This is what tells the interface it should kill itself
 }
 
-inline void write_cache(nlohmann::json &cache) {
+void write_cache(nlohmann::json &cache) {
     std::ofstream cache_file;
     cache_file.open(find_bin_path() + "/daemon_cache.json", std::ios::trunc);
 
@@ -108,7 +101,7 @@ inline void write_cache(nlohmann::json &cache) {
     cache_file.close();
 }
 
-inline void listener_clean_exit(int sig) {
+void listener_clean_exit(int sig) {
     std::cout << "\n" << "Quitting..." << "\n";
     const std::string path = find_bin_path()+"/fifo";
     unlink(path.c_str());
@@ -117,10 +110,9 @@ inline void listener_clean_exit(int sig) {
     exit(0);
 }
 
-inline void write_kill_file(const std::string& daemon) {
+void write_kill_file(const std::string& daemon) {
     std::ofstream kill;
     kill.open("kill", std::ios::trunc);
     kill << daemon;
     kill.close();
 }
-#endif

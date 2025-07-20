@@ -6,8 +6,9 @@
  */
 #include <chrono>
 #include <thread>
+#include <sstream>
 
-#include "daemon_api.hpp"
+#include "daemon_api.h"
 
 
 // The arguments are a vector of the configuration in daemon_cache.json that has been space separated, using something like

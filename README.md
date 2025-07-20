@@ -68,7 +68,11 @@ You can figure the functionality by reading the comments in this file, which is 
 To use the API, all you have to do is include it.
 All the functions are commented and very self-explanatory.
 
-https://github.com/LimeTheDerg/LDM/blob/main/daemons/daemon_api.hpp
+Header:
+https://github.com/LimeTheDerg/LDM/blob/main/daemons/daemon_api.h
+
+Source:
+https://github.com/LimeTheDerg/LDM/blob/main/daemons/daemon_api.cpp
 
 You will need to create a cache entry yourself by modifying the daemon_cache.json file, read on for more details.
 
@@ -85,8 +89,9 @@ Here's a link to the file: https://github.com/LimeTheDerg/LDM/blob/main/daemons/
  */
 #include <chrono>
 #include <thread>
+#include <sstream>
 
-#include "daemon_api.hpp"
+#include "daemon_api.h"
 
 
 // The arguments are a vector of the configuration in daemon_cache.json that has been space separated, using something like
@@ -101,7 +106,7 @@ int main(int argc, const char *argv[]) {
 
         // This is the logging function, it appends the arguments of the function to log
         daemon_api_log("[ERROR] - INVALID ARGUMENT OR CONFIGURATION: " + bin_name); // bin_name is a variable in the daemon_api.hpp file that is the name of the daemon,
-                                                                                    // this variable is meant for the API itself, but you can use it like this if you like, but DO NOT MODIFY IT
+                                                                                            // this variable is meant for the API itself, but you can use it like this if you like, but DO NOT MODIFY IT
         return 1;
     }
 

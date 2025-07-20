@@ -1,7 +1,9 @@
 #include <chrono>
+#include <stdexcept>
 #include <thread>
+#include <sstream>
 
-#include "daemon_api.hpp"
+#include "daemon_api.h"
 
 int main(int argc, char* argv[]) {
     daemonize(argv[0]);

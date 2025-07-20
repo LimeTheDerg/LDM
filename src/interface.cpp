@@ -2,7 +2,7 @@
 #include <iostream>
 
 #include "lib/json/json.hpp"
-#include "lib/util/helper_functions.hpp"
+#include "lib/util/helper_functions.h"
 
 using std::cout;
 using std::cerr;
